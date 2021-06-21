@@ -19,6 +19,7 @@ import UIKit
 import MobileCoreServices
 import ObjectivePGP
 import EmptyDataSet_Swift
+import YubiKit
 
 class KeychainViewController: UIViewController {
 
@@ -299,28 +300,50 @@ extension KeychainViewController: UIDocumentPickerDelegate {
 
 extension KeychainViewController: UITableViewDataSource, UITableViewDelegate {
 
+    var yubikey: Int {
+        return (Preferences.yubikey ? 1 : 0)
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isFiltering() {
             return filteredContacts.count
         } else {
-            return contacts.count
+            return contacts.count + yubikey
         }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cntct = contacts[indexPath.row]
+        if (!isFiltering() && indexPath.row == 0 && Preferences.yubikey) {
+            return YubikeyTableViewCell()
+        }
+        var contactIndex = indexPath.row - yubikey
         if isFiltering() {
-            cntct = filteredContacts[indexPath.row]
+            contactIndex += yubikey
+        }
+
+        var cntct = contacts[contactIndex]
+        if isFiltering() {
+            cntct = filteredContacts[contactIndex]
         }
         if let cell = keychainTableView.dequeueReusableCell(withIdentifier: "KeychainTableViewCell") as? KeychainTableViewCell {
             cell.setContact(contact: cntct)
             return cell
         } else {
-            return UITableViewCell() // Dummy return value
+            return UITableViewCell()
         }
     }
 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if (!isFiltering() && indexPath.row == 0 && Preferences.yubikey) {
+            Log.s("Can't delete the Yubikey cell!")
+            return // Don't delete the Yubikey cell
+        }
+
+        var contactIndex = indexPath.row - yubikey
+        if isFiltering() {
+            contactIndex += yubikey
+        }
+
         if editingStyle == .delete {
             let alert = UIAlertController(
                 title: NSLocalizedString(
@@ -349,9 +372,9 @@ extension KeychainViewController: UITableViewDataSource, UITableViewDelegate {
                     style: .destructive,
                     handler: { _ in
                         if self.isFiltering() {
-                            let cntct = self.filteredContacts[indexPath.row]
+                            let cntct = self.filteredContacts[contactIndex]
 
-                            self.filteredContacts.remove(at: indexPath.row)
+                            self.filteredContacts.remove(at: contactIndex)
                             self.keychainTableView.deleteRows(at: [indexPath], with: .bottom)
 
                             ContactListService.remove(cntct)
@@ -359,7 +382,7 @@ extension KeychainViewController: UITableViewDataSource, UITableViewDelegate {
 
                         } else {
                             // Remove from storage and update local list
-                            ContactListService.remove(self.contacts[indexPath.row])
+                            ContactListService.remove(self.contacts[contactIndex])
                             self.contacts = ContactListService.get(ofType: .both)
 
                             // Remove from view and update view
@@ -386,9 +409,19 @@ extension KeychainViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        var contact = contacts[indexPath.row]
+        if (!isFiltering() && indexPath.row == 0 && Preferences.yubikey) {
+            // TODO: This code gets executed when the Yubikey button is pressed
+            return
+        }
+
+        var contactIndex = indexPath.row - yubikey
         if isFiltering() {
-            contact = filteredContacts[indexPath.row]
+            contactIndex += yubikey
+        }
+
+        var contact = contacts[contactIndex]
+        if isFiltering() {
+            contact = filteredContacts[contactIndex]
         }
 
         let detailViewController = ContactDetailViewController()

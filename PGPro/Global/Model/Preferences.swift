@@ -29,6 +29,7 @@ class Preferences {
         static var mailIntegrationClient = "preference.mailIntegrationClient"
         static var biometricAuthentication = "preference.biometricAuthentication"
         static var reviewWorthyActions = "reviewWorthyActionCount"
+        static var yubikey = "preference.yubikey"
     }
 
     static func setToDefault() {
@@ -36,6 +37,7 @@ class Preferences {
         defaults.set(0, forKey: UserDefaultsKeys.numRatings)
         defaults.set(false, forKey: UserDefaultsKeys.mailIntegration)
         defaults.set(false, forKey: UserDefaultsKeys.biometricAuthentication)
+        defaults.set(true,  forKey: UserDefaultsKeys.yubikey)
     }
 
     static var mailIntegrationEnabled: Bool {
@@ -58,6 +60,12 @@ class Preferences {
 
     static var biometricAuthentication: Bool {
         UserDefaults.standard.bool(forKey: UserDefaultsKeys.biometricAuthentication)
+    }
+
+    static var yubikey: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: UserDefaultsKeys.biometricAuthentication)
+        }
     }
 
     static var numRatings: Int {
