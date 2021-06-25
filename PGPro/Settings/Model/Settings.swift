@@ -36,13 +36,13 @@ class Setting {
     }
 
     var title: String
-    var symbolName: String
+    var symbol: UIImage
     var subtitle: String?
     var type: SettingType
 
-    init(title: String, symbol: String, subtitle: String? = nil, of type: SettingType) {
+    init(title: String, symbol: UIImage, subtitle: String? = nil, of type: SettingType) {
         self.title = title
-        self.symbolName = symbol
+        self.symbol = symbol
         self.subtitle = subtitle
         self.type = type
     }
@@ -51,9 +51,9 @@ class Setting {
 
     // Activity:
     private(set) var activity: ((_ viewController: UIViewController, _ completion: () -> Void) -> Void)?
-    init(title: String, symbol: String, subtitle: String? = nil, withActivity activity: @escaping (_ viewController: UIViewController, _ completion: () -> Void) -> Void) {
+    init(title: String, symbol: UIImage, subtitle: String? = nil, withActivity activity: @escaping (_ viewController: UIViewController, _ completion: () -> Void) -> Void) {
         self.title = title
-        self.symbolName = symbol
+        self.symbol = symbol
         self.subtitle = subtitle
         self.type = .activity
         self.activity = activity
@@ -61,9 +61,9 @@ class Setting {
 
     // Action:
     private(set) var action: (() -> Void)?
-    init(title: String, symbol: String, subtitle: String? = nil, actionType: ActionType = .normal, withAction action: @escaping () -> Void) {
+    init(title: String, symbol: UIImage, subtitle: String? = nil, actionType: ActionType = .normal, withAction action: @escaping () -> Void) {
         self.title = title
-        self.symbolName = symbol
+        self.symbol = symbol
         self.subtitle = subtitle
         self.type = .action(type: actionType)
         self.action = action
@@ -83,9 +83,9 @@ class Setting {
         }
     }
 
-    init(title: String, symbol: String, subtitle: String? = nil, forKey key: String, enabled: Bool) {
+    init(title: String, symbol: UIImage, subtitle: String? = nil, forKey key: String, enabled: Bool) {
         self.title = title
-        self.symbolName = symbol
+        self.symbol = symbol
         self.subtitle = subtitle
         self.type = .preference
         self.userDefaultsKey = key
@@ -94,9 +94,9 @@ class Setting {
 
     // Link:
     private(set) var url: URL?
-    init(title: String, symbol: String, subtitle: String? = nil, withURL url: URL) {
+    init(title: String, symbol: UIImage, subtitle: String? = nil, withURL url: URL) {
         self.title = title
-        self.symbolName = symbol
+        self.symbol = symbol
         self.subtitle = subtitle
         self.type = .link
         self.url = url
@@ -104,9 +104,9 @@ class Setting {
 
     // Segue:
     private(set) var viewController: UIViewController?
-    init(title: String, symbol: String, subtitle: String? = nil, to viewController: UIViewController) {
+    init(title: String, symbol: UIImage, subtitle: String? = nil, to viewController: UIViewController) {
         self.title = title
-        self.symbolName = symbol
+        self.symbol = symbol
         self.subtitle = subtitle
         self.type = .segue
         self.viewController = viewController
@@ -132,6 +132,7 @@ class Settings {
         allSettings[SettingsDictKey(.data, DataSection.deleteAllKeys.rawValue)]            = deleteAllKeys
         allSettings[SettingsDictKey(.preferences, PreferencesSection.mailIntegration.rawValue)]   = mailIntegration
         allSettings[SettingsDictKey(.preferences, PreferencesSection.authentication.rawValue)]    = authentication
+        allSettings[SettingsDictKey(.preferences,   PreferencesSection.yubikey.rawValue)]           = yubikey
         allSettings[SettingsDictKey(.feedback, FeedbackSection.sendFeedback.rawValue)]         = reportIssue
         allSettings[SettingsDictKey(.feedback, FeedbackSection.joinBeta.rawValue)]             = joinBeta
         allSettings[SettingsDictKey(.feedback, FeedbackSection.askForRating.rawValue)]         = askForRating
@@ -180,6 +181,7 @@ class Settings {
     enum PreferencesSection: Int, CaseIterable {
         case mailIntegration = 0
         case authentication = 1
+        case yubikey = 2
 
         static var header: String {
             return "Preferences"
@@ -207,8 +209,9 @@ class Settings {
         }
     }
 
-    // MARK: - Actual Settings
-    let exportKeychain = Setting(title: "Export Keychain", symbol: "square.and.arrow.up") { viewController, completion in
+
+    // Mark: - Actual Settings
+    let exportKeychain = Setting(title: "Export Keychain", symbol: UIImage(systemName: "square.and.arrow.up")!) { viewController, completion in
         DispatchQueue.global(qos: .default).async {
             let keyring = Keyring()
             var keys: [Key] = []
@@ -263,6 +266,14 @@ class Settings {
         symbol: AuthenticationService.symbolName,
         forKey: Preferences.UserDefaultsKeys.biometricAuthentication,
         enabled: Constants.User.canUseBiometrics
+    )
+    /// \todo Localize Yubikey strings
+    let yubikey        = Setting(
+        title: "Yubikey",
+        symbol: UIImage(systemName: "key.fill")!,
+        //symbol: UIImage.resize(image: UIImage(named: "LASKey")!, targetSize: CGSize(width: 8, height: 22)),
+        forKey: Preferences.UserDefaultsKeys.yubikey,
+        enabled: Yubikey.supportedByDevice
     )
     let reportIssue = Setting(
         title: NSLocalizedString("Report Issue", comment: "The option to report issue in settings"),
