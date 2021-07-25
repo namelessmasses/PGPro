@@ -22,6 +22,10 @@ class Preferences {
 
     static private let defaults = UserDefaults.standard
 
+    struct Development {
+        static var hideKeychain = true
+    }
+
     enum UserDefaultsKeys {
         static var numRatings = "numRatings"
         static var launchedBefore = "launchedBefore"
