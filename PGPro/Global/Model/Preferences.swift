@@ -23,7 +23,7 @@ class Preferences {
     static private let defaults = UserDefaults.standard
 
     struct Development {
-        static var hideKeychain = true
+        static var hideKeychain = false
     }
 
     enum UserDefaultsKeys {
