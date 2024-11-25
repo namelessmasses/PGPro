@@ -3,3 +3,6 @@
 *.m       text diff=objc
 ObjectivePGP.framework/* linguist-vendored
 docs/* linguist-vendored
+
+# Ensure consistent line endings
+* text=auto
