@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:PGPro}",
+            "name": "Debug PGPro",
+            "program": "${workspaceFolder:PGPro}/.build/debug/PGPro",
+            "preLaunchTask": "swift: Build Debug PGPro"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:PGPro}",
+            "name": "Release PGPro",
+            "program": "${workspaceFolder:PGPro}/.build/release/PGPro",
+            "preLaunchTask": "swift: Build Release PGPro"
+        }
+    ]
+}

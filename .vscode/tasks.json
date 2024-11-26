@@ -1,0 +1,27 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "swift",
+			"args": [
+				"build",
+				"--swift-sdk=arm64-apple-ios",
+				"--build-tests",
+				"-Xswiftc",
+				"-diagnostic-style=llvm",
+				"-Xswiftc",
+				"-swift-version",
+				"-Xswiftc",
+				"5"
+			],
+			"env": {},
+			"cwd": "/workspaces/PGPro",
+			"disableTaskQueue": true,
+			"showBuildStatus": "swiftStatus",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "swift: Build All (iOS)",
+			"detail": "swift build --swift-sdk=arm64-apple-ios --build-tests -Xswiftc -diagnostic-style=llvm"
+		}
+	]
+}
