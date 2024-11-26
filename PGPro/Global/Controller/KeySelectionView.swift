@@ -19,8 +19,13 @@ import UIKit
 
 class KeySelectionViewController: UIViewController {
 
-    init(<#parameters#>) {
-        <#statements#>
+    init(contacts: [Contact]) {
+        self.contacts = contacts
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     private var contacts: [Contact]
